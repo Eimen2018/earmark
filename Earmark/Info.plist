@@ -28,5 +28,15 @@
 	<string>© 2026 Aymen Nurhussen. MIT License.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Earmark listens to the call through your microphone and turns speech into text on this Mac. Audio never leaves the Mac.</string>
+	<key>SUAutomaticallyUpdate</key>
+	<true/>
+	<key>SUEnableAutomaticChecks</key>
+	<true/>
+	<key>SUFeedURL</key>
+	<string>https://raw.githubusercontent.com/Eimen2018/earmark/main/appcast.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>XDUBL9id3ICG6seRwZvF4IkCFWPe+YUv5Ji6M+/aw0U=</string>
+	<key>SUScheduledCheckInterval</key>
+	<integer>86400</integer>
 </dict>
 </plist>

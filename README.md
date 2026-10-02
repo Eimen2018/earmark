@@ -33,6 +33,8 @@ nothing is saved when you close the app.
 - **Wireless mic friendly**: picks a wireless lav (e.g. BOYA) automatically, warns when the
   transmitter goes silent (off, unpaired, or mid battery swap), and recovers when the receiver is
   unplugged and plugged back in.
+- **Automatic updates** via [Sparkle](https://sparkle-project.org): new versions download in the
+  background and install the next time you quit, so an update never interrupts a call.
 - **Guided setup** on first launch: microphone, one-time model download, voice sample, tips.
 
 ## Install
@@ -85,6 +87,11 @@ To produce a notarized DMG (needs `create-dmg` and a notarytool keychain profile
 ```bash
 NOTARY_PROFILE=my-profile Scripts/release.sh
 ```
+
+The script also builds the Sparkle update (`build/appcast/Earmark-x.y.z.zip`, EdDSA-signed with the
+key stored in the login keychain under the account `earmark`) and refreshes `appcast.xml`. To publish:
+commit `appcast.xml`, then attach both the DMG and the zip to a GitHub release tagged `vx.y.z`.
+Installed copies read the appcast from `main` and update themselves.
 
 The app icon is drawn in code: `swift Scripts/render-icon.swift Resources/AppIcon-1024.png`.
 

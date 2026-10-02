@@ -183,6 +183,7 @@ struct OnboardingView: View {
                 Tip(key: "N", text: "Write a note. Esc takes you back to the captions. Right-click a line to add it to your notes.")
                 Tip(key: "Speakers", text: "Click a speaker's name to rename them, dim or hide their lines, or merge two labels that are really the same person.")
                 Tip(key: "New call", text: "Clears captions, notes, kept details and speaker names. Nothing is stored after you close the app.")
+                Tip(key: "Updates", text: "New versions download quietly and install the next time you quit Earmark, never during a call.")
             }
         }
     }

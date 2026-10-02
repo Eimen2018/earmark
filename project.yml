@@ -8,6 +8,9 @@ packages:
   FluidAudio:
     url: https://github.com/FluidInference/FluidAudio.git
     from: "0.12.4"
+  Sparkle:
+    url: https://github.com/sparkle-project/Sparkle
+    from: "2.9.4"
 settings:
   base:
     SWIFT_VERSION: "5.0"
@@ -20,6 +23,7 @@ targets:
       - Earmark
     dependencies:
       - package: FluidAudio
+      - package: Sparkle
     info:
       path: Earmark/Info.plist
       properties:
@@ -29,6 +33,12 @@ targets:
         LSApplicationCategoryType: public.app-category.productivity
         LSMinimumSystemVersion: $(MACOSX_DEPLOYMENT_TARGET)
         NSHumanReadableCopyright: © 2026 Aymen Nurhussen. MIT License.
+        # Sparkle: check daily, download in the background, install when she quits (never mid-call).
+        SUFeedURL: https://raw.githubusercontent.com/Eimen2018/earmark/main/appcast.xml
+        SUPublicEDKey: XDUBL9id3ICG6seRwZvF4IkCFWPe+YUv5Ji6M+/aw0U=
+        SUEnableAutomaticChecks: true
+        SUAutomaticallyUpdate: true
+        SUScheduledCheckInterval: 86400
         NSMicrophoneUsageDescription: Earmark listens to the call through your microphone and turns speech into text on this Mac. Audio never leaves the Mac.
     settings:
       base:
@@ -42,8 +52,8 @@ targets:
         OTHER_CODE_SIGN_FLAGS: --timestamp
         CODE_SIGN_ENTITLEMENTS: Earmark/Earmark.entitlements
         GENERATE_INFOPLIST_FILE: NO
-        MARKETING_VERSION: "0.1.2"
-        CURRENT_PROJECT_VERSION: "3"
+        MARKETING_VERSION: "0.1.3"
+        CURRENT_PROJECT_VERSION: "4"
       configs:
         Release:
           # Notarization rejects the debugger entitlement Xcode injects by default.
