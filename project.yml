@@ -1,0 +1,50 @@
+name: Earmark
+options:
+  bundleIdPrefix: com.aymen
+  deploymentTarget:
+    macOS: "15.0"
+  createIntermediateGroups: true
+packages:
+  FluidAudio:
+    url: https://github.com/FluidInference/FluidAudio.git
+    from: "0.12.4"
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MACOSX_DEPLOYMENT_TARGET: "15.0"
+targets:
+  Earmark:
+    type: application
+    platform: macOS
+    sources:
+      - Earmark
+    dependencies:
+      - package: FluidAudio
+    info:
+      path: Earmark/Info.plist
+      properties:
+        CFBundleDisplayName: Earmark
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        LSApplicationCategoryType: public.app-category.productivity
+        LSMinimumSystemVersion: $(MACOSX_DEPLOYMENT_TARGET)
+        NSHumanReadableCopyright: © 2026 Aymen Nurhussen. MIT License.
+        NSMicrophoneUsageDescription: Earmark listens to the call through your microphone and turns speech into text on this Mac. Audio never leaves the Mac.
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.aymen.Earmark
+        PRODUCT_NAME: Earmark
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        CODE_SIGN_STYLE: Manual
+        CODE_SIGN_IDENTITY: "Developer ID Application"
+        DEVELOPMENT_TEAM: RZSB2YU49Q
+        ENABLE_HARDENED_RUNTIME: YES
+        OTHER_CODE_SIGN_FLAGS: --timestamp
+        CODE_SIGN_ENTITLEMENTS: Earmark/Earmark.entitlements
+        GENERATE_INFOPLIST_FILE: NO
+        MARKETING_VERSION: "0.1.0"
+        CURRENT_PROJECT_VERSION: "1"
+      configs:
+        Release:
+          # Notarization rejects the debugger entitlement Xcode injects by default.
+          CODE_SIGN_INJECT_BASE_ENTITLEMENTS: NO

@@ -1,0 +1,386 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		079B6ACB9075162791974C08 /* AudioCapture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 958777DE34993805EA3A177F /* AudioCapture.swift */; };
+		2322F8D924433329338C909C /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5AA6EF433ACC3477C817F57 /* AppModel.swift */; };
+		361128AEBF8B699090EE02CC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AAE9A9335F97805AB4F047FD /* Assets.xcassets */; };
+		670853EC5060555195B9B58D /* CaptionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = D132CD1416B476397C0032B7 /* CaptionEngine.swift */; };
+		849472BA099C5FECA371694C /* EarmarkApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A2328CA6A0B3A1873E6ACE5 /* EarmarkApp.swift */; };
+		9C93BC8245BAAA51E48A4D54 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B87E8E7B60397106F177BB03 /* ContentView.swift */; };
+		B171C88100F64E7587B1B4C8 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84F69A0F6F35CD19A8F42B86 /* OnboardingView.swift */; };
+		B32DE1AF5797A2428E655A07 /* DetailFinder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 079A3BB5574D5D3159EFB2CA /* DetailFinder.swift */; };
+		B6A1DC3B4A7C7BCBBCD33244 /* FluidAudio in Frameworks */ = {isa = PBXBuildFile; productRef = D8E277FBFB598F2D1663CC05 /* FluidAudio */; };
+		FD9F01A70D7DA20CE1EBFDF5 /* AudioDevices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96560F4B6486CCBC6CF8CA02 /* AudioDevices.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		079A3BB5574D5D3159EFB2CA /* DetailFinder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailFinder.swift; sourceTree = "<group>"; };
+		1C7DE4A5CA938E53610AB05B /* Earmark.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Earmark.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1E27AD598612B7E30D75B477 /* Earmark.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Earmark.entitlements; sourceTree = "<group>"; };
+		7A2328CA6A0B3A1873E6ACE5 /* EarmarkApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EarmarkApp.swift; sourceTree = "<group>"; };
+		84F69A0F6F35CD19A8F42B86 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		955584DC8B0F3B8CCB85497D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		958777DE34993805EA3A177F /* AudioCapture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioCapture.swift; sourceTree = "<group>"; };
+		96560F4B6486CCBC6CF8CA02 /* AudioDevices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioDevices.swift; sourceTree = "<group>"; };
+		AAE9A9335F97805AB4F047FD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		B87E8E7B60397106F177BB03 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		D132CD1416B476397C0032B7 /* CaptionEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptionEngine.swift; sourceTree = "<group>"; };
+		D5AA6EF433ACC3477C817F57 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		99B6306A1360263DD3A883FB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B6A1DC3B4A7C7BCBBCD33244 /* FluidAudio in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		2ECD55EA0A8B041EED1CE472 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1C7DE4A5CA938E53610AB05B /* Earmark.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		3C679A2A823174233E13E172 = {
+			isa = PBXGroup;
+			children = (
+				C307836167CE954A66D7E341 /* Earmark */,
+				2ECD55EA0A8B041EED1CE472 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		C307836167CE954A66D7E341 /* Earmark */ = {
+			isa = PBXGroup;
+			children = (
+				D5AA6EF433ACC3477C817F57 /* AppModel.swift */,
+				AAE9A9335F97805AB4F047FD /* Assets.xcassets */,
+				958777DE34993805EA3A177F /* AudioCapture.swift */,
+				96560F4B6486CCBC6CF8CA02 /* AudioDevices.swift */,
+				D132CD1416B476397C0032B7 /* CaptionEngine.swift */,
+				B87E8E7B60397106F177BB03 /* ContentView.swift */,
+				079A3BB5574D5D3159EFB2CA /* DetailFinder.swift */,
+				1E27AD598612B7E30D75B477 /* Earmark.entitlements */,
+				7A2328CA6A0B3A1873E6ACE5 /* EarmarkApp.swift */,
+				955584DC8B0F3B8CCB85497D /* Info.plist */,
+				84F69A0F6F35CD19A8F42B86 /* OnboardingView.swift */,
+			);
+			path = Earmark;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		4023B64D87FB9F7DCB8677CA /* Earmark */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F170F9C61E155B2A2C906111 /* Build configuration list for PBXNativeTarget "Earmark" */;
+			buildPhases = (
+				8621CC55D19C854DFE66AB94 /* Sources */,
+				E4A2C9EAE9B8BD65D1800DC2 /* Resources */,
+				99B6306A1360263DD3A883FB /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Earmark;
+			packageProductDependencies = (
+				D8E277FBFB598F2D1663CC05 /* FluidAudio */,
+			);
+			productName = Earmark;
+			productReference = 1C7DE4A5CA938E53610AB05B /* Earmark.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		2E0FED915C47DD28FDB943E8 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					4023B64D87FB9F7DCB8677CA = {
+						DevelopmentTeam = RZSB2YU49Q;
+						ProvisioningStyle = Manual;
+					};
+				};
+			};
+			buildConfigurationList = 6BE04E3B87C9A5A2DBB20FC3 /* Build configuration list for PBXProject "Earmark" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 3C679A2A823174233E13E172;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				5BB683B6176558128584492B /* XCRemoteSwiftPackageReference "FluidAudio" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 2ECD55EA0A8B041EED1CE472 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				4023B64D87FB9F7DCB8677CA /* Earmark */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		E4A2C9EAE9B8BD65D1800DC2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				361128AEBF8B699090EE02CC /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8621CC55D19C854DFE66AB94 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2322F8D924433329338C909C /* AppModel.swift in Sources */,
+				079B6ACB9075162791974C08 /* AudioCapture.swift in Sources */,
+				FD9F01A70D7DA20CE1EBFDF5 /* AudioDevices.swift in Sources */,
+				670853EC5060555195B9B58D /* CaptionEngine.swift in Sources */,
+				9C93BC8245BAAA51E48A4D54 /* ContentView.swift in Sources */,
+				B32DE1AF5797A2428E655A07 /* DetailFinder.swift in Sources */,
+				849472BA099C5FECA371694C /* EarmarkApp.swift in Sources */,
+				B171C88100F64E7587B1B4C8 /* OnboardingView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1452029B86DF2C4F0A69D225 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Earmark/Earmark.entitlements;
+				CODE_SIGN_IDENTITY = "Developer ID Application";
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = RZSB2YU49Q;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Earmark/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				OTHER_CODE_SIGN_FLAGS = "--timestamp";
+				PRODUCT_BUNDLE_IDENTIFIER = com.aymen.Earmark;
+				PRODUCT_NAME = Earmark;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		354F9C2C64D928337C4CD6AE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		991EC36D3C0F8BACF5172059 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		B8BE349D9584B1A1AD451BD9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Earmark/Earmark.entitlements;
+				CODE_SIGN_IDENTITY = "Developer ID Application";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = RZSB2YU49Q;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Earmark/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				OTHER_CODE_SIGN_FLAGS = "--timestamp";
+				PRODUCT_BUNDLE_IDENTIFIER = com.aymen.Earmark;
+				PRODUCT_NAME = Earmark;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		6BE04E3B87C9A5A2DBB20FC3 /* Build configuration list for PBXProject "Earmark" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				354F9C2C64D928337C4CD6AE /* Debug */,
+				991EC36D3C0F8BACF5172059 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		F170F9C61E155B2A2C906111 /* Build configuration list for PBXNativeTarget "Earmark" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B8BE349D9584B1A1AD451BD9 /* Debug */,
+				1452029B86DF2C4F0A69D225 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		5BB683B6176558128584492B /* XCRemoteSwiftPackageReference "FluidAudio" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/FluidInference/FluidAudio.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.12.4;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		D8E277FBFB598F2D1663CC05 /* FluidAudio */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5BB683B6176558128584492B /* XCRemoteSwiftPackageReference "FluidAudio" */;
+			productName = FluidAudio;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 2E0FED915C47DD28FDB943E8 /* Project object */;
+}
