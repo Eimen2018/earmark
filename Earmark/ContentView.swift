@@ -22,7 +22,7 @@ private extension NSAppearance {
 }
 
 struct ContentView: View {
-    @EnvironmentObject var model: AppModel
+    @Environment(AppModel.self) private var model
     @State private var confirmNewCall = false
     @State private var showVoiceSheet = false
     @AppStorage("onboarded") private var onboarded = false
@@ -78,7 +78,7 @@ struct ContentView: View {
                 ForEach(model.devices) { Text($0.name).tag($0.id) }
             }
             .frame(maxWidth: 220)
-            LevelMeter(level: model.level)
+            LiveLevelMeter()
 
             ControlGroup {
                 Button { model.fontSize = max(16, model.fontSize - 3) } label: { Image(systemName: "textformat.size.smaller") }
@@ -94,6 +94,12 @@ struct ContentView: View {
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
     }
+}
+
+/// Reads the level itself, so the 16-per-second updates only redraw this little bar.
+struct LiveLevelMeter: View {
+    @Environment(AppModel.self) private var model
+    var body: some View { LevelMeter(level: model.level) }
 }
 
 struct LevelMeter: View {
@@ -115,8 +121,11 @@ struct LevelMeter: View {
 // MARK: - Transcript
 
 struct TranscriptView: View {
-    @EnvironmentObject var model: AppModel
-    @State private var atBottom = true
+    @Environment(AppModel.self) private var model
+    /// Keep the newest line in view. Only her own scrolling turns this off; new text never does.
+    @State private var follow = true
+    @State private var nearBottom = true
+    @State private var userScrolling = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -150,17 +159,33 @@ struct TranscriptView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     .onScrollGeometryChange(for: Bool.self) { geo in
-                        geo.contentOffset.y + geo.containerSize.height >= geo.contentSize.height - 40
-                    } action: { _, isAtBottom in
-                        atBottom = isAtBottom
+                        geo.contentOffset.y + geo.containerSize.height >= geo.contentSize.height - 60
+                    } action: { _, isNear in
+                        nearBottom = isNear
+                        if isNear && userScrolling { follow = true }
                     }
-                    .onChange(of: model.lines.count) { if atBottom { proxy.scrollTo("bottom") } }
-                    .onChange(of: model.partial) { if atBottom { proxy.scrollTo("bottom") } }
+                    .onScrollPhaseChange { _, phase in
+                        switch phase {
+                        case .tracking, .interacting, .decelerating:
+                            userScrolling = true
+                        case .idle:
+                            if userScrolling { follow = nearBottom }
+                            userScrolling = false
+                        default:
+                            break
+                        }
+                    }
+                    .onChange(of: model.lines.count) { keepLatest(proxy) }
+                    .onChange(of: model.partial) { keepLatest(proxy) }
+                    .onChange(of: model.fontSize) { keepLatest(proxy) }
                     .overlay(alignment: .bottomTrailing) {
-                        if !atBottom {
-                            Button("Jump to latest") { proxy.scrollTo("bottom"); atBottom = true }
-                                .buttonStyle(.borderedProminent)
-                                .padding(16)
+                        if !follow {
+                            Button("Jump to latest") {
+                                follow = true
+                                proxy.scrollTo("bottom", anchor: .bottom)
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .padding(16)
                         }
                     }
                 }
@@ -178,8 +203,16 @@ struct TranscriptView: View {
     }
 }
 
+extension TranscriptView {
+    /// Scroll after layout has settled, so the new line's height is known.
+    func keepLatest(_ proxy: ScrollViewProxy) {
+        guard follow, !userScrolling else { return }
+        DispatchQueue.main.async { proxy.scrollTo("bottom", anchor: .bottom) }
+    }
+}
+
 struct LineRow: View {
-    @EnvironmentObject var model: AppModel
+    @Environment(AppModel.self) private var model
     let line: CaptionLine
 
     var body: some View {
@@ -220,7 +253,7 @@ struct LineRow: View {
 /// Who's been heard on this call. Click a chip to name them, dim/hide their lines,
 /// or merge them into someone else when the separation split one person in two.
 struct SpeakerBar: View {
-    @EnvironmentObject var model: AppModel
+    @Environment(AppModel.self) private var model
     @State private var renaming: Int?
     @State private var draft = ""
 
@@ -286,7 +319,7 @@ struct SpeakerBar: View {
 // MARK: - Kept
 
 struct KeptPanel: View {
-    @EnvironmentObject var model: AppModel
+    @Environment(AppModel.self) private var model
     @State private var copied: UUID?
 
     var body: some View {
@@ -339,7 +372,7 @@ struct KeptPanel: View {
 
 /// Records 15 s of her voice so her own lines get labelled "Me" and dimmed.
 struct VoiceRecorder: View {
-    @EnvironmentObject var model: AppModel
+    @Environment(AppModel.self) private var model
     var onFinish: () -> Void = {}
     @State private var secondsLeft = 15
     @State private var timer: Timer?
@@ -354,7 +387,7 @@ struct VoiceRecorder: View {
                     .padding()
                     .background(RoundedRectangle(cornerRadius: 10).fill(.quaternary))
                 HStack(spacing: 10) {
-                    LevelMeter(level: model.level)
+                    LiveLevelMeter()
                     Text("\(secondsLeft) s left").monospacedDigit().foregroundStyle(.secondary)
                     Spacer()
                     Button("Cancel") { stop(save: false) }

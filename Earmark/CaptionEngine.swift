@@ -44,6 +44,7 @@ actor CaptionEngine {
     private var total = 0                        // absolute samples since the session started
     private var utteranceStart: Int?
     private var lastPartialAt = 0
+    private var lastSplitCheck = 0
     private var refinements: [(id: UUID, from: Int, to: Int, due: Int, speaker: Int?)] = []
     private var myVoice: [Float]?
     private var debugPeakProb: Float = 0
@@ -96,6 +97,7 @@ actor CaptionEngine {
         total = 0
         utteranceStart = nil
         lastPartialAt = 0
+        lastSplitCheck = 0
         refinements.removeAll()
         diarizer?.reset()
         enrollMyVoiceIfAny()
@@ -172,6 +174,11 @@ actor CaptionEngine {
             await finish(from: start, to: total)
         }
 
+        if total - lastSplitCheck >= Self.rate / 2 {
+            lastSplitCheck = total
+            await splitOnSpeakerChange()
+        }
+
         if let start = utteranceStart, total - lastPartialAt >= Self.partialEvery, total - start >= Self.rate / 2 {
             lastPartialAt = total
             emit(.partial(await transcribe(from: start, to: total)))
@@ -211,11 +218,47 @@ actor CaptionEngine {
         do { result = try await asr.transcribe(samples, decoderState: &state) }
         catch { log.error("transcribe failed: \(String(describing: error), privacy: .public)"); result = nil }
         log.debug("transcribed \(samples.count) samples -> \(result?.text.count ?? -1) chars")
-        return result?.text.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        // Same normalisation for the live line and the final one, so numbers don't flip between digits and words.
+        return SpokenNumbers.normalize(result?.text.trimmingCharacters(in: .whitespacesAndNewlines) ?? "")
+    }
+
+    /// Quick turn-taking often has no pause long enough to end the utterance, which glues two
+    /// speakers into one line. When Sortformer hears a different voice for the last second,
+    /// cut the line where that voice took over.
+    private func splitOnSpeakerChange() async {
+        guard let start = utteranceStart else { return }
+        let probeEnd = total - Self.rate / 2          // Sortformer's view of the newest ~0.5 s is still forming
+        let probeStart = probeEnd - Self.rate
+        guard probeStart - start >= Self.rate,
+              let earlier = dominantSpeaker(from: start, to: probeStart, threshold: 0.4),
+              let recent = dominantSpeaker(from: probeStart, to: probeEnd, threshold: 0.5),
+              earlier != recent else { return }
+        let cut = changePoint(from: probeStart - Self.rate / 2, to: probeEnd, old: earlier, new: recent) ?? probeStart
+        guard cut - start >= Self.rate / 2 else { return }
+        log.debug("speaker change \(earlier) -> \(recent), splitting line")
+        utteranceStart = cut
+        lastPartialAt = total
+        await finish(from: start, to: cut)
+    }
+
+    /// First sample where `new` is speaking and `old` isn't.
+    private func changePoint(from start: Int, to end: Int, old: Int, new: Int) -> Int? {
+        guard let timeline = diarizer?.timeline else { return nil }
+        let samplesPerFrame = Double(Self.rate) * Self.frameSeconds
+        let f0 = Int(Double(max(0, start)) / samplesPerFrame), f1 = Int(Double(end) / samplesPerFrame)
+        guard f0 < f1 else { return nil }
+        for frame in f0..<f1 {
+            func p(_ slot: Int) -> Float {
+                let v = timeline.probability(speaker: slot, frame: frame)
+                return v.isNaN ? timeline.tentativeProbability(speaker: slot, frame: frame) : v
+            }
+            if p(new) > 0.5 && !(p(old) > 0.5) { return Int(Double(frame) * samplesPerFrame) }
+        }
+        return nil
     }
 
     /// The Sortformer slot with the most speech probability across this stretch of audio.
-    private func dominantSpeaker(from start: Int, to end: Int) -> Int? {
+    private func dominantSpeaker(from start: Int, to end: Int, threshold: Float = 0.2) -> Int? {
         guard let diarizer else { return nil }
         let timeline = diarizer.timeline
         let slots = diarizer.numSpeakers ?? 4
@@ -233,7 +276,7 @@ actor CaptionEngine {
             if seen { frames += 1 }
         }
         guard frames > 0, let best = sums.indices.max(by: { sums[$0] < sums[$1] }),
-              sums[best] / Float(frames) > 0.2 else { return nil }
+              sums[best] / Float(frames) > threshold else { return nil }
         return best
     }
 }

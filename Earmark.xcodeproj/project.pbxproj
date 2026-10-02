@@ -10,6 +10,7 @@
 		079B6ACB9075162791974C08 /* AudioCapture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 958777DE34993805EA3A177F /* AudioCapture.swift */; };
 		2322F8D924433329338C909C /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5AA6EF433ACC3477C817F57 /* AppModel.swift */; };
 		361128AEBF8B699090EE02CC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AAE9A9335F97805AB4F047FD /* Assets.xcassets */; };
+		3BCF411EC7D95D48EE099750 /* SpokenNumbers.swift in Sources */ = {isa = PBXBuildFile; fileRef = F363D4523F236D18A527E5E4 /* SpokenNumbers.swift */; };
 		670853EC5060555195B9B58D /* CaptionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = D132CD1416B476397C0032B7 /* CaptionEngine.swift */; };
 		849472BA099C5FECA371694C /* EarmarkApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A2328CA6A0B3A1873E6ACE5 /* EarmarkApp.swift */; };
 		9C93BC8245BAAA51E48A4D54 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B87E8E7B60397106F177BB03 /* ContentView.swift */; };
@@ -32,6 +33,7 @@
 		B87E8E7B60397106F177BB03 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		D132CD1416B476397C0032B7 /* CaptionEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptionEngine.swift; sourceTree = "<group>"; };
 		D5AA6EF433ACC3477C817F57 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+		F363D4523F236D18A527E5E4 /* SpokenNumbers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpokenNumbers.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,6 +78,7 @@
 				7A2328CA6A0B3A1873E6ACE5 /* EarmarkApp.swift */,
 				955584DC8B0F3B8CCB85497D /* Info.plist */,
 				84F69A0F6F35CD19A8F42B86 /* OnboardingView.swift */,
+				F363D4523F236D18A527E5E4 /* SpokenNumbers.swift */,
 			);
 			path = Earmark;
 			sourceTree = "<group>";
@@ -164,6 +167,7 @@
 				B32DE1AF5797A2428E655A07 /* DetailFinder.swift in Sources */,
 				849472BA099C5FECA371694C /* EarmarkApp.swift in Sources */,
 				B171C88100F64E7587B1B4C8 /* OnboardingView.swift in Sources */,
+				3BCF411EC7D95D48EE099750 /* SpokenNumbers.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -179,7 +183,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = RZSB2YU49Q;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -188,7 +192,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 0.1.1;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp";
 				PRODUCT_BUNDLE_IDENTIFIER = com.aymen.Earmark;
 				PRODUCT_NAME = Earmark;
@@ -323,7 +327,7 @@
 				CODE_SIGN_IDENTITY = "Developer ID Application";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = RZSB2YU49Q;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -332,7 +336,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 0.1.1;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp";
 				PRODUCT_BUNDLE_IDENTIFIER = com.aymen.Earmark;
 				PRODUCT_NAME = Earmark;

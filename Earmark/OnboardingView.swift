@@ -2,7 +2,7 @@ import SwiftUI
 
 /// First-launch guide: what Earmark does, microphone, model download, her voice, and the few things worth knowing.
 struct OnboardingView: View {
-    @EnvironmentObject var model: AppModel
+    @Environment(AppModel.self) private var model
     var onDone: () -> Void
     @State private var step = 0
     private let steps = 5
@@ -121,7 +121,7 @@ struct OnboardingView: View {
                     }
                     .frame(maxWidth: 360)
                     HStack(spacing: 12) {
-                        LevelMeter(level: model.level).frame(width: 200)
+                        LiveLevelMeter().frame(width: 200)
                         Text(model.noSound ? "No sound. Is the transmitter on and paired (solid blue light)?" : "Say something. The bar should move.")
                             .foregroundStyle(model.noSound ? .orange : .secondary)
                     }

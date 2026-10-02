@@ -42,8 +42,8 @@ targets:
         OTHER_CODE_SIGN_FLAGS: --timestamp
         CODE_SIGN_ENTITLEMENTS: Earmark/Earmark.entitlements
         GENERATE_INFOPLIST_FILE: NO
-        MARKETING_VERSION: "0.1.0"
-        CURRENT_PROJECT_VERSION: "1"
+        MARKETING_VERSION: "0.1.1"
+        CURRENT_PROJECT_VERSION: "2"
       configs:
         Release:
           # Notarization rejects the debugger entitlement Xcode injects by default.

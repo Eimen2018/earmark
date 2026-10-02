@@ -70,37 +70,43 @@ private enum VoiceStore {
 }
 
 @MainActor
-final class AppModel: ObservableObject {
-    @Published var status = "Starting…"
-    @Published var isError = false
-    @Published var isReady = false
-    @Published var loadingStep = "Preparing"
-    @Published var loadingFraction: Double?
-    @Published var isListening = false
-    @Published var micAuthorized = AVCaptureDevice.authorizationStatus(for: .audio) == .authorized
-    @Published var micDenied = AVCaptureDevice.authorizationStatus(for: .audio) == .denied
-    @Published var level: Float = 0
-    @Published var noSound = false
-    @Published var devices: [InputDevice] = []
-    @Published var deviceID: String?
-    @Published var lines: [CaptionLine] = []
-    @Published var partial = ""
-    @Published var kept: [KeptItem] = []
-    @Published var speakers: [Int: SpeakerInfo] = [:]
+@Observable
+final class AppModel {
+    var status = "Starting…"
+    var isError = false
+    var isReady = false
+    var loadingStep = "Preparing"
+    var loadingFraction: Double?
+    var isListening = false
+    var micAuthorized = AVCaptureDevice.authorizationStatus(for: .audio) == .authorized
+    var micDenied = AVCaptureDevice.authorizationStatus(for: .audio) == .denied
+    var level: Float = 0
+    var noSound = false
+    var devices: [InputDevice] = []
+    var deviceID: String?
+    var lines: [CaptionLine] = []
+    var partial = ""
+    var kept: [KeptItem] = []
+    var speakers: [Int: SpeakerInfo] = [:]
     /// Slots Sortformer split off the same person, folded into another slot. Per call.
-    @Published var mergedInto: [Int: Int] = [:]
-    @Published var mySlot: Int?
-    @Published var hasMyVoice = false
-    @Published var recordingVoice = false
-    @Published var fontSize: CGFloat = 26
+    var mergedInto: [Int: Int] = [:]
+    var mySlot: Int?
+    var hasMyVoice = false
+    var recordingVoice = false
+    var fontSize: CGFloat = 26
 
-    private let engine: CaptionEngine
-    private let capture = AudioCapture()
-    private let router: SampleRouter
-    private var userPickedDevice = false
-    private var deviceObservers: [NSObjectProtocol] = []
-    private var silentSince: Date?
-    private var lastLevelPush = Date.distantPast
+    /// Speaker chips to show: one per slot heard this call, merged slots folded away.
+    /// Stored (not computed from `lines`) so the speaker menus don't rebuild on every new line.
+    private(set) var seenSlots: [Int] = []
+
+    @ObservationIgnored private let engine: CaptionEngine
+    @ObservationIgnored private let capture = AudioCapture()
+    @ObservationIgnored private let router: SampleRouter
+    @ObservationIgnored private var userPickedDevice = false
+    @ObservationIgnored private var deviceObservers: [NSObjectProtocol] = []
+    @ObservationIgnored private var silentSince: Date?
+    @ObservationIgnored private var lastLevelPush = Date.distantPast
+    @ObservationIgnored private var heardSlots = Set<Int>()
 
     init() {
         let (events, eventSink) = AsyncStream.makeStream(of: EngineEvent.self)
@@ -214,7 +220,9 @@ final class AppModel: ObservableObject {
         kept.removeAll()
         partial = ""
         mergedInto.removeAll()
+        heardSlots.removeAll()
         speakers = speakers.filter { $0.key == mySlot }
+        refreshSeenSlots()
         Task { await engine.newSession() }
     }
 
@@ -244,6 +252,7 @@ final class AppModel: ObservableObject {
         hasMyVoice = false
         if let mySlot { speakers[mySlot] = nil }
         mySlot = nil
+        refreshSeenSlots()
         Task { await engine.setMyVoice(nil) }
     }
 
@@ -265,11 +274,13 @@ final class AppModel: ObservableObject {
     func rename(_ slot: Int, to name: String) {
         let slot = canonical(slot) ?? slot
         speakers[slot, default: SpeakerInfo(name: name)].name = name
+        refreshSeenSlots()
     }
 
     func setVisibility(_ slot: Int, _ visibility: SpeakerVisibility) {
         let slot = canonical(slot) ?? slot
         speakers[slot, default: SpeakerInfo(name: "Speaker \(slot + 1)")].visibility = visibility
+        refreshSeenSlots()
     }
 
     /// "These two are the same person": everything from `slot`, past and future, shows as `target`.
@@ -279,15 +290,17 @@ final class AppModel: ObservableObject {
         // Anything already merged into `slot` follows it.
         for (key, value) in mergedInto where value == slot { mergedInto[key] = target }
         if slot == mySlot { mySlot = target }
+        refreshSeenSlots()
     }
 
     func separate(_ slot: Int) {
         mergedInto[slot] = nil
+        refreshSeenSlots()
     }
 
-    /// Slots that currently have their own chip (merged ones fold into their target).
-    var seenSlots: [Int] {
-        Set(lines.compactMap { canonical($0.speaker) }).union(speakers.keys.compactMap(canonical)).sorted()
+    private func refreshSeenSlots() {
+        let slots = Set(heardSlots.compactMap(canonical)).union(speakers.keys.compactMap(canonical)).sorted()
+        if slots != seenSlots { seenSlots = slots }
     }
 
     /// Slots folded into `slot`, for the "Separate again" menu.
@@ -297,10 +310,18 @@ final class AppModel: ObservableObject {
 
     // MARK: - Kept
 
+    /// "303-555-0142" and "3035550142" are the same number; compare numbers by their digits.
+    private static func keptKey(_ value: String) -> String {
+        let digits = value.filter(\.isNumber)
+        let letters = value.filter(\.isLetter)
+        if digits.count >= 4 && letters.count <= 2 { return digits + letters.lowercased() }
+        return value.lowercased().split(whereSeparator: \.isWhitespace).joined(separator: " ")
+    }
+
     func keep(_ kind: String, _ value: String, announce: Bool) {
-        let norm = value.lowercased().split(whereSeparator: \.isWhitespace).joined(separator: " ")
+        let norm = Self.keptKey(value)
         guard !norm.isEmpty else { return }
-        if let at = kept.firstIndex(where: { $0.value.lowercased().split(whereSeparator: \.isWhitespace).joined(separator: " ") == norm }) {
+        if let at = kept.firstIndex(where: { Self.keptKey($0.value) == norm }) {
             guard announce else { return }
             kept.remove(at: at)
         }
@@ -340,14 +361,17 @@ final class AppModel: ObservableObject {
         case .line(let id, let text, let speaker):
             let details = DetailFinder.find(in: text)
             lines.append(CaptionLine(id: id, text: text, speaker: speaker, details: details))
+            if let speaker, heardSlots.insert(speaker).inserted { refreshSeenSlots() }
             for detail in details { keep(detail.kind, String(text[detail.range]), announce: false) }
         case .speaker(let id, let speaker):
             if let i = lines.firstIndex(where: { $0.id == id }) { lines[i].speaker = speaker }
+            if let speaker, heardSlots.insert(speaker).inserted { refreshSeenSlots() }
         case .enrolled(let slot):
             if let old = mySlot, old != slot { speakers[old] = nil }
             mySlot = slot
             if let slot { speakers[slot] = SpeakerInfo(name: "Me", visibility: .dim) }
-            else if hasMyVoice { setError("Couldn't hear speech in your voice sample. Record it again from Teach my voice.") }
+            refreshSeenSlots()
+            if slot == nil && hasMyVoice { setError("Couldn't hear speech in your voice sample. Record it again from Teach my voice.") }
         }
     }
 

@@ -2,13 +2,13 @@ import SwiftUI
 
 @main
 struct EarmarkApp: App {
-    @StateObject private var model = AppModel()
+    @State private var model = AppModel()
     @AppStorage("onboarded") private var onboarded = false
 
     var body: some Scene {
         Window("Earmark", id: "main") {
             ContentView()
-                .environmentObject(model)
+                .environment(model)
                 .onKeyPress("k") {
                     model.keepLastLine()
                     return .handled
