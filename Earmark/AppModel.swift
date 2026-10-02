@@ -94,6 +94,10 @@ final class AppModel {
     var hasMyVoice = false
     var recordingVoice = false
     var fontSize: CGFloat = 26
+    /// Her own notes for this call. In memory only; New call clears them.
+    var notes = ""
+    /// Bumped to ask the notes field to take focus (from the menu or the N key).
+    var focusNotesRequest = 0
 
     /// Speaker chips to show: one per slot heard this call, merged slots folded away.
     /// Stored (not computed from `lines`) so the speaker menus don't rebuild on every new line.
@@ -218,6 +222,7 @@ final class AppModel {
     func newCall() {
         lines.removeAll()
         kept.removeAll()
+        notes = ""
         partial = ""
         mergedInto.removeAll()
         heardSlots.removeAll()
@@ -332,6 +337,14 @@ final class AppModel {
         guard let last = lines.last(where: { info(for: $0.speaker)?.visibility != .hide }) else { return }
         keep("Line", last.text, announce: true)
     }
+
+    var hasCallContent: Bool { !lines.isEmpty || !kept.isEmpty || !notes.isEmpty }
+
+    func addToNotes(_ text: String) {
+        notes += (notes.isEmpty || notes.hasSuffix("\n") ? "" : "\n") + text + "\n"
+    }
+
+    func focusNotes() { focusNotesRequest += 1 }
 
     func copy(_ text: String) {
         NSPasteboard.general.clearContents()

@@ -22,6 +22,9 @@ nothing is saved when you close the app.
 - **Live captions** in large, adjustable text, with the current sentence updating as it's spoken.
 - **Kept details**: phone numbers, addresses, dates, amounts and IDs are highlighted and collected
   in a side list. Click any of them to copy. Press <kbd>K</kbd> to keep the last line.
+- **Notes**: a scratch pad under the Kept list. Press <kbd>N</kbd> (or <kbd>⌘J</kbd>) to start typing,
+  <kbd>Esc</kbd> to go back, and right-click any caption line to add it to your notes. Notes are
+  cleared with the call, like everything else.
 - **Who's speaking**: each voice gets its own label and colour. Rename speakers ("Me",
   "English caller"…), dim or hide their lines, and **merge** two labels when the model splits one
   person in two.

@@ -180,8 +180,9 @@ struct OnboardingView: View {
                 Tip(key: "Space", text: "Start or pause captions.")
                 Tip(key: "Click", text: "Click a highlighted number or address to copy it. Everything highlighted also collects under Kept.")
                 Tip(key: "K", text: "Keep the last line in the Kept list.")
+                Tip(key: "N", text: "Write a note. Esc takes you back to the captions. Right-click a line to add it to your notes.")
                 Tip(key: "Speakers", text: "Click a speaker's name to rename them, dim or hide their lines, or merge two labels that are really the same person.")
-                Tip(key: "New call", text: "Clears captions, kept details and speaker names. Nothing is stored after you close the app.")
+                Tip(key: "New call", text: "Clears captions, notes, kept details and speaker names. Nothing is stored after you close the app.")
             }
         }
     }

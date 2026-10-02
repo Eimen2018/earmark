@@ -9,10 +9,6 @@ struct EarmarkApp: App {
         Window("Earmark", id: "main") {
             ContentView()
                 .environment(model)
-                .onKeyPress("k") {
-                    model.keepLastLine()
-                    return .handled
-                }
         }
         .defaultSize(width: 1100, height: 720)
         .commands {
@@ -23,6 +19,8 @@ struct EarmarkApp: App {
                     .disabled(!model.isReady)
                 Button("Keep Last Line") { model.keepLastLine() }
                     .keyboardShortcut("k", modifiers: .command)
+                Button("Write a Note") { model.focusNotes() }
+                    .keyboardShortcut("j", modifiers: .command)
                 Divider()
                 Button("New Call") { model.newCall() }
                     .keyboardShortcut("n", modifiers: [.command, .shift])

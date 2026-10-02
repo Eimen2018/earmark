@@ -21,30 +21,56 @@ private extension NSAppearance {
     var isDark: Bool { bestMatch(from: [.darkAqua, .aqua]) == .darkAqua }
 }
 
+/// Where the keyboard is: the captions (single-key shortcuts work) or her notes (keys are typing).
+enum KeyFocus: Hashable { case captions, notes }
+
 struct ContentView: View {
     @Environment(AppModel.self) private var model
     @State private var confirmNewCall = false
     @State private var showVoiceSheet = false
     @AppStorage("onboarded") private var onboarded = false
+    @FocusState private var focus: KeyFocus?
 
     var body: some View {
         VStack(spacing: 0) {
             toolbar
             Divider()
             HSplitView {
-                KeptPanel()
-                    .frame(minWidth: 220, idealWidth: 280, maxWidth: 380)
+                VSplitView {
+                    KeptPanel()
+                        .frame(minHeight: 160)
+                    NotesPanel(focus: $focus)
+                        .frame(minHeight: 140, idealHeight: 220)
+                }
+                .frame(minWidth: 220, idealWidth: 280, maxWidth: 380)
                 TranscriptView()
                     .frame(minWidth: 400)
             }
         }
         .frame(minWidth: 760, minHeight: 480)
+        // The window itself takes focus so Space/K/N work without clicking anything first.
+        .focusable()
+        .focusEffectDisabled()
+        .focused($focus, equals: .captions)
+        .onAppear { focus = .captions }
+        // Single-key shortcuts step aside while she's typing a note.
+        .onKeyPress(.space) {
+            guard focus != .notes else { return .ignored }
+            model.toggleListening()
+            return .handled
+        }
+        .onKeyPress(characters: CharacterSet(charactersIn: "kKnN")) { press in
+            guard focus != .notes else { return .ignored }
+            if press.characters.lowercased() == "k" { model.keepLastLine() } else { focus = .notes }
+            return .handled
+        }
+        .onChange(of: model.focusNotesRequest) { focus = .notes }
         .sheet(isPresented: $showVoiceSheet) { VoiceSheet() }
         .sheet(isPresented: Binding(get: { !onboarded }, set: { onboarded = !$0 })) {
             OnboardingView { onboarded = true }
                 .interactiveDismissDisabled()
         }
-        .confirmationDialog("Clear the captions and everything kept?", isPresented: $confirmNewCall) {
+        .confirmationDialog("Clear the captions, notes and everything kept?", isPresented: $confirmNewCall) {
             Button("New call", role: .destructive) { model.newCall() }
         }
     }
@@ -60,7 +86,7 @@ struct ContentView: View {
             .tint(model.isListening ? .red : .accentColor)
             .controlSize(.large)
             .disabled(!model.isReady)
-            .keyboardShortcut(.space, modifiers: [])
+            .help("Start or pause captions (Space)")
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(model.noSound && model.isListening
@@ -88,7 +114,7 @@ struct ContentView: View {
 
             Button(model.hasMyVoice ? "My voice ✓" : "Teach my voice") { showVoiceSheet = true }
             Button("New call") {
-                if model.lines.isEmpty && model.kept.isEmpty { model.newCall() } else { confirmNewCall = true }
+                if model.hasCallContent { confirmNewCall = true } else { model.newCall() }
             }
         }
         .padding(.horizontal, 16)
@@ -231,6 +257,7 @@ struct LineRow: View {
         .opacity(info?.visibility == .dim ? 0.45 : 1)
         .contextMenu {
             Button("Keep this line") { model.keep("Line", line.text, announce: true) }
+            Button("Add to notes") { model.addToNotes(line.text) }
             Button("Copy line") { model.copy(line.text) }
         }
     }
@@ -363,6 +390,55 @@ struct KeptPanel: View {
             Text("Press K to keep the last line.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
+        }
+        .padding(16)
+    }
+}
+
+// MARK: - Notes
+
+/// A scratch pad for the call. Press N to start typing, Esc to go back to the captions.
+struct NotesPanel: View {
+    @Environment(AppModel.self) private var model
+    var focus: FocusState<KeyFocus?>.Binding
+    @State private var copied = false
+
+    var body: some View {
+        @Bindable var model = model
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("Notes").font(.headline)
+                Spacer()
+                if !model.notes.isEmpty {
+                    Button(copied ? "Copied" : "Copy all") {
+                        model.copy(model.notes)
+                        copied = true
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { copied = false }
+                    }
+                    .buttonStyle(.borderless)
+                    .font(.callout)
+                }
+            }
+            ZStack(alignment: .topLeading) {
+                TextEditor(text: $model.notes)
+                    .font(.system(size: 16))
+                    .scrollContentBackground(.hidden)
+                    .focused(focus, equals: .notes)
+                    .onKeyPress(.escape) {
+                        focus.wrappedValue = .captions
+                        return .handled
+                    }
+                if model.notes.isEmpty && focus.wrappedValue != .notes {
+                    Text("Press N to write a note. Esc goes back.")
+                        .font(.system(size: 15))
+                        .foregroundStyle(.tertiary)
+                        .padding(.leading, 5)
+                        .allowsHitTesting(false)
+                }
+            }
+            .padding(8)
+            .background(RoundedRectangle(cornerRadius: 8).fill(Color(nsColor: .controlBackgroundColor)))
+            .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(focus.wrappedValue == .notes ? Color.accentColor : .clear, lineWidth: 2))
         }
         .padding(16)
     }
