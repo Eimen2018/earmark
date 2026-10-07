@@ -12,6 +12,13 @@ struct CaptionLine: Identifiable {
     let details: [Detail]
 }
 
+/// An Amharic translation she asked for, under its caption line.
+enum Translation {
+    case working
+    case done(String)
+    case failed(String)
+}
+
 struct KeptItem: Identifiable {
     let id = UUID()
     let kind: String
@@ -98,6 +105,16 @@ final class AppModel {
     var notes = ""
     /// Bumped to ask the notes field to take focus (from the menu or the N key).
     var focusNotesRequest = 0
+    /// Amharic for the lines she asked about, by line id. In memory only; New call clears them.
+    var translations: [UUID: Translation] = [:]
+    /// Bumped when a translation lands, so the transcript can keep the newest line in view.
+    var translationsChanged = 0
+    /// She turned translation on, having read what leaves the Mac.
+    var translationOn = UserDefaults.standard.bool(forKey: "translationOn") {
+        didSet { UserDefaults.standard.set(translationOn, forKey: "translationOn") }
+    }
+    var hasTranslationKey = TranslationKey.load() != nil
+    var showTranslationSetup = false
 
     /// Speaker chips to show: one per slot heard this call, merged slots folded away.
     /// Stored (not computed from `lines`) so the speaker menus don't rebuild on every new line.
@@ -222,6 +239,7 @@ final class AppModel {
     func newCall() {
         lines.removeAll()
         kept.removeAll()
+        translations.removeAll()
         notes = ""
         partial = ""
         mergedInto.removeAll()
@@ -349,6 +367,54 @@ final class AppModel {
     func copy(_ text: String) {
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(text, forType: .string)
+    }
+
+    // MARK: - Amharic
+
+    /// Sends this one line for translation, or opens setup if translation isn't on yet.
+    func translate(_ line: CaptionLine) {
+        if case .working = translations[line.id] { return }
+        guard translationOn, let key = TranslationKey.load() else { showTranslationSetup = true; return }
+        let id = line.id
+        translations[id] = .working
+        Task {
+            let result: Translation
+            do { result = .done(try await Translator.translate(line.text, details: line.details, key: key)) }
+            catch { result = .failed(error.localizedDescription) }
+            // New call may have cleared the line while it was out.
+            guard lines.contains(where: { $0.id == id }) else { return }
+            translations[id] = result
+            translationsChanged += 1
+        }
+    }
+
+    /// Hover button and menu: show the Amharic, or hide it again.
+    func toggleTranslation(_ line: CaptionLine) {
+        switch translations[line.id] {
+        case .done, .failed: translations[line.id] = nil
+        case .working: break
+        case nil: translate(line)
+        }
+    }
+
+    /// T: the newest line from someone other than her, since that's the one she's stuck on.
+    func translateLastLine() {
+        let visible = lines.filter { info(for: $0.speaker)?.visibility != .hide }
+        let theirs = visible.last { mySlot == nil || canonical($0.speaker) != canonical(mySlot) }
+        guard let line = theirs ?? visible.last else { return }
+        if case .done = translations[line.id] { return }
+        translate(line)
+    }
+
+    func saveTranslationKey(_ key: String) {
+        TranslationKey.save(key)
+        hasTranslationKey = true
+    }
+
+    func removeTranslationKey() {
+        TranslationKey.delete()
+        hasTranslationKey = false
+        translationOn = false
     }
 
     // MARK: - Engine events

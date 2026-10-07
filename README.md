@@ -14,8 +14,13 @@ headset, captions the call in large text, tells the speakers apart, and keeps ev
 address in a list you can copy from with one click.
 
 **Everything runs on your Mac.** Speech recognition, speaker separation and voice detection are
-on-device models running on the Apple Neural Engine. No audio or text ever leaves the machine, and
-nothing is saved when you close the app.
+on-device models running on the Apple Neural Engine. No audio ever leaves the machine, no text does
+unless you ask for a translation (below), and nothing is saved when you close the app.
+
+The one exception is **Amharic translation**, which is off until you set it up. When you ask for a line in
+Amharic, that single line is sent to Google's Gemini through [OpenRouter](https://openrouter.ai). Phone
+numbers, dates, addresses, amounts and IDs are swapped for placeholders before it leaves the Mac and put back
+afterwards. Nothing else from the call is sent, and audio never is.
 
 ## Features
 
@@ -25,6 +30,10 @@ nothing is saved when you close the app.
 - **Notes**: a scratch pad under the Kept list. Press <kbd>N</kbd> (or <kbd>⌘J</kbd>) to start typing,
   <kbd>Esc</kbd> to go back, and right-click any caption line to add it to your notes. Notes are
   cleared with the call, like everything else.
+- **Amharic on demand**: stuck on a line? Press <kbd>T</kbd> (or <kbd>⌘T</kbd>) to see the last caller line in
+  Amharic, or hover over any line and click **አማ**. The translation appears under the line in about two
+  seconds; click **Copy** to copy it. Set it up once under *Captions › Amharic Translation…* with an
+  OpenRouter key, which is stored in your Keychain.
 - **Who's speaking**: each voice gets its own label and colour. Rename speakers ("Me",
   "English caller"…), dim or hide their lines, and **merge** two labels when the model splits one
   person in two.
@@ -69,7 +78,10 @@ captions ─▶ NSDataDetector + patterns ──▶ highlighted details ──�
 - Speaker labels start fresh with every **New call**.
 - Audio picked up from a headset earpiece is quieter and narrower than a room mic, so expect the
   occasional wrong word or split speaker. Always confirm numbers with the caller.
-- Check your agency's policy on transcription tools, even fully local ones.
+- Check your agency's policy on transcription tools, even fully local ones, and before turning on
+  Amharic translation, which sends the lines you pick over the internet.
+- Translations come from Gemini 3.8 Flash. They were checked against real call phrases, but treat them as a
+  prompt, not an authority.
 
 ## Build from source
 

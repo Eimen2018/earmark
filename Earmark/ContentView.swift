@@ -10,6 +10,8 @@ enum Palette {
     ]
     static let unknown = Color.secondary
     static let marker = Color(nsColor: NSColor(name: nil) { $0.isDark ? #colorLiteral(red: 0.58, green: 0.25, blue: 0.42, alpha: 1) : #colorLiteral(red: 1, green: 0.8, blue: 0.9, alpha: 1) })
+    /// The bar beside an Amharic translation.
+    static let translation = Color(nsColor: NSColor(name: nil) { $0.isDark ? #colorLiteral(red: 0.36, green: 0.78, blue: 0.84, alpha: 1) : #colorLiteral(red: 0.0, green: 0.47, blue: 0.55, alpha: 1) })
 
     static func color(_ slot: Int?) -> Color {
         guard let slot, speakers.indices.contains(slot) else { return unknown }
@@ -32,6 +34,7 @@ struct ContentView: View {
     @FocusState private var focus: KeyFocus?
 
     var body: some View {
+        @Bindable var model = model
         VStack(spacing: 0) {
             toolbar
             Divider()
@@ -59,13 +62,18 @@ struct ContentView: View {
             model.toggleListening()
             return .handled
         }
-        .onKeyPress(characters: CharacterSet(charactersIn: "kKnN")) { press in
+        .onKeyPress(characters: CharacterSet(charactersIn: "kKnNtT")) { press in
             guard focus != .notes else { return .ignored }
-            if press.characters.lowercased() == "k" { model.keepLastLine() } else { focus = .notes }
+            switch press.characters.lowercased() {
+            case "k": model.keepLastLine()
+            case "t": model.translateLastLine()
+            default: focus = .notes
+            }
             return .handled
         }
         .onChange(of: model.focusNotesRequest) { focus = .notes }
         .sheet(isPresented: $showVoiceSheet) { VoiceSheet() }
+        .sheet(isPresented: $model.showTranslationSetup) { TranslationSetupView() }
         .sheet(isPresented: Binding(get: { !onboarded }, set: { onboarded = !$0 })) {
             OnboardingView { onboarded = true }
                 .interactiveDismissDisabled()
@@ -94,7 +102,9 @@ struct ContentView: View {
                      : model.status)
                     .foregroundStyle(model.isError || (model.noSound && model.isListening) ? .red : .secondary)
                     .lineLimit(2)
-                Text("On this Mac only. Nothing is saved.")
+                Text(model.translationOn
+                     ? "Captions stay on this Mac. Lines you translate are sent. Nothing is saved."
+                     : "On this Mac only. Nothing is saved.")
                     .font(.caption)
                     .foregroundStyle(.tertiary)
             }
@@ -204,6 +214,7 @@ struct TranscriptView: View {
                     .onChange(of: model.lines.count) { keepLatest(proxy) }
                     .onChange(of: model.partial) { keepLatest(proxy) }
                     .onChange(of: model.fontSize) { keepLatest(proxy) }
+                    .onChange(of: model.translationsChanged) { keepLatest(proxy) }
                     .overlay(alignment: .bottomTrailing) {
                         if !follow {
                             Button("Jump to latest") {
@@ -240,22 +251,36 @@ extension TranscriptView {
 struct LineRow: View {
     @Environment(AppModel.self) private var model
     let line: CaptionLine
+    @State private var hovering = false
 
     var body: some View {
         let info = model.info(for: line.speaker)
+        let translation = model.translations[line.id]
         HStack(alignment: .firstTextBaseline, spacing: 12) {
             Text(info?.name ?? "?")
                 .font(.system(size: max(12, model.fontSize * 0.45), weight: .semibold))
                 .foregroundStyle(Palette.color(model.canonical(line.speaker)))
                 .frame(width: 96, alignment: .trailing)
                 .lineLimit(1)
-            Text(attributed)
-                .font(.system(size: model.fontSize))
-                .textSelection(.enabled)
-                .frame(maxWidth: 900, alignment: .leading)
+            VStack(alignment: .leading, spacing: model.fontSize * 0.3) {
+                Text(attributed)
+                    .font(.system(size: model.fontSize))
+                    .textSelection(.enabled)
+                if let translation { TranslationView(line: line, translation: translation) }
+            }
+            .frame(maxWidth: 900, alignment: .leading)
+            Button { model.toggleTranslation(line) } label: { Text("አማ").font(.system(size: 13, weight: .semibold)) }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+                .help(translation == nil ? "Show this line in Amharic (T for the last line)" : "Hide the Amharic")
+                .opacity(hovering || translation != nil ? 1 : 0)
+                .allowsHitTesting(hovering || translation != nil)
         }
         .opacity(info?.visibility == .dim ? 0.45 : 1)
+        .onHover { hovering = $0 }
         .contextMenu {
+            Button(translation == nil ? "Translate to Amharic" : "Hide Amharic") { model.toggleTranslation(line) }
+            Divider()
             Button("Keep this line") { model.keep("Line", line.text, announce: true) }
             Button("Add to notes") { model.addToNotes(line.text) }
             Button("Copy line") { model.copy(line.text) }
@@ -274,6 +299,120 @@ struct LineRow: View {
             result[lower..<upper].link = URL(string: "copy:" + (value.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? ""))
         }
         return result
+    }
+}
+
+/// The Amharic under a line: working, the translation itself, or what went wrong.
+struct TranslationView: View {
+    @Environment(AppModel.self) private var model
+    let line: CaptionLine
+    let translation: Translation
+    @State private var copied = false
+
+    var body: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 10) {
+            switch translation {
+            case .working:
+                ProgressView().controlSize(.small)
+                Text("Translating…").foregroundStyle(.secondary)
+            case .done(let amharic):
+                Text(amharic)
+                    .textSelection(.enabled)
+                    .fixedSize(horizontal: false, vertical: true)
+                Button(copied ? "Copied" : "Copy") {
+                    model.copy(amharic)
+                    copied = true
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) { copied = false }
+                }
+                .buttonStyle(.borderless)
+                .font(.callout)
+            case .failed(let message):
+                Text(message).foregroundStyle(.red)
+                Button("Try again") { model.translations[line.id] = nil; model.translate(line) }
+                    .buttonStyle(.borderless)
+                    .font(.callout)
+            }
+        }
+        .font(.system(size: model.fontSize * 0.85))
+        .padding(.leading, 12)
+        .overlay(alignment: .leading) {
+            RoundedRectangle(cornerRadius: 1.5).fill(Palette.translation).frame(width: 3)
+        }
+    }
+}
+
+/// One-time setup: what leaves the Mac, her OpenRouter key, and the switch.
+struct TranslationSetupView: View {
+    @Environment(AppModel.self) private var model
+    @Environment(\.dismiss) private var dismiss
+    @State private var draft = ""
+    @State private var checking = false
+    @State private var problem: String?
+
+    var body: some View {
+        @Bindable var model = model
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Amharic translation").font(.title2.bold())
+            Text("Press T to see the last caller line in Amharic, or hover over any line and click አማ. It takes about two seconds.")
+                .fixedSize(horizontal: false, vertical: true)
+
+            VStack(alignment: .leading, spacing: 6) {
+                Label("This sends the line to the internet", systemImage: "network").font(.headline)
+                Text("Only the line you pick is sent, to Google's Gemini through OpenRouter. Phone numbers, dates, addresses, amounts and IDs are replaced with placeholders before it leaves the Mac and put back after. Names and the other words in that line are sent. Nothing else from the call leaves the Mac, and audio never does.")
+                Text("Check your agency's policy before using this on calls.").bold()
+            }
+            .font(.callout)
+            .fixedSize(horizontal: false, vertical: true)
+            .padding(12)
+            .background(RoundedRectangle(cornerRadius: 10).fill(.quaternary))
+
+            if model.hasTranslationKey {
+                HStack {
+                    Label("OpenRouter key saved in your Keychain", systemImage: "checkmark.circle.fill").foregroundStyle(.green)
+                    Spacer()
+                    Button("Remove key", role: .destructive) { model.removeTranslationKey() }
+                }
+            } else {
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack {
+                        SecureField("OpenRouter key (sk-or-…)", text: $draft)
+                            .textFieldStyle(.roundedBorder)
+                            .onSubmit(saveKey)
+                        Button(checking ? "Checking…" : "Save key", action: saveKey)
+                            .disabled(draft.trimmingCharacters(in: .whitespaces).isEmpty || checking)
+                    }
+                    if let problem { Text(problem).foregroundStyle(.red).font(.callout) }
+                    Link("Get a key at openrouter.ai/keys", destination: URL(string: "https://openrouter.ai/keys")!)
+                        .font(.callout)
+                }
+            }
+
+            Toggle("Turn on Amharic translation", isOn: $model.translationOn)
+                .disabled(!model.hasTranslationKey)
+
+            HStack { Spacer(); Button("Done") { dismiss() }.keyboardShortcut(.defaultAction) }
+        }
+        .padding(24)
+        .frame(width: 520)
+    }
+
+    /// Tries the key on a one-word line before keeping it, so a typo shows up now and not mid-call.
+    private func saveKey() {
+        let key = draft.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !key.isEmpty else { return }
+        checking = true
+        problem = nil
+        Task {
+            do {
+                _ = try await Translator.translate("Hello.", key: key)
+                model.saveTranslationKey(key)
+                model.translationOn = true
+                draft = ""
+            } catch {
+                problem = error.localizedDescription
+            }
+            checking = false
+        }
     }
 }
 

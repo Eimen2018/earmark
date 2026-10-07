@@ -27,6 +27,9 @@ struct EarmarkApp: App {
                     .keyboardShortcut("k", modifiers: .command)
                 Button("Write a Note") { model.focusNotes() }
                     .keyboardShortcut("j", modifiers: .command)
+                Button("Translate Last Line to Amharic") { model.translateLastLine() }
+                    .keyboardShortcut("t", modifiers: .command)
+                Button("Amharic Translation…") { model.showTranslationSetup = true }
                 Divider()
                 Button("New Call") { model.newCall() }
                     .keyboardShortcut("n", modifiers: [.command, .shift])
